@@ -2,6 +2,12 @@ import serial
 import msvcrt
 from itertools import permutations
 
+#ser = serial.Serial("COM3", 9600)
+
+#for x in range(10):
+#	x = ser.read()
+#	print x
+
 class Keypress():
 	def __init__(self):
 		self.keymap = {
@@ -35,10 +41,3 @@ class Keypress():
 k = Keypress()
 while True:
 	k.get_press()
-
-#ser = serial.Serial("COM3", 9600)
-
-#for x in range(10):
-#	x = ser.read()
-#	print x
-
