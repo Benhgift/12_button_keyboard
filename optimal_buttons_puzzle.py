@@ -1,3 +1,12 @@
+# I'm trying to find the optimal button->letter map for the keyboard.
+# These are the facts:
+#     The keyboard uses 8 buttons for letters, 2-mer combination map 1:1 to letters
+#         ex: button 0 and button 1 at the same time map to 's'
+#     Buttons that are often pressed in succession shouldn't have their combination overlap
+#         ex: 's' mapped to (0,1) shouldn't then have 't' mapped to (0,2)
+#     Succession buttons like that that are very common should occur on different hands
+#         ex: 's' mapped to (0,1) (left hand) would then benefit from 't' being on (5,6) (right hand)
+
 from itertools import combinations
 from string import ascii_lowercase
 from collections import namedtuple as nt
