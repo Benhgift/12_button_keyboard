@@ -30,14 +30,34 @@ def _init_buttons(data):
         data.combinations.remove(button1.combo)
     return data
 
-def _find_the_next_piece(data): 
+# alg:
+# make a 2d DP table. 
+# x axis = all combinations of n-mers from the chord set, (1), (2), (2,4,5) etc
+#   this represents usable combos, start at smallest
+# y axis = all combinations of n-mers from the alphabet
+#   this represents usable letters, start at smallest
+# fill in table, for example for a (2,4,5) and (s,t,e), it would look at the 
+#   the best 2mer combinations that used (2,4), (4,5) and (2,5) for each 2mer of (s,t,e)
+#   and attach to the best one after computing how much better the score is after adding 
+#   the third letter (s,t or e). A total or n*n comparisons
+
+def _find_the_next_combo(data): 
     # try each of the combinations, pick the one that combines for the biggest gains
+        # find next letter for each combo
+    chosen_combo = None
+    for combo in data.combinations:
+        # to find the value for this combo we need to compare all the reprocussions of this
+        break
+    return data
+
+def _find_the_next_letter(data): 
+    # for each letter find the best one to use for thise combo
     return data
 
 def find_best_buttons(buttons, aphabet):
     empty_data = RunningData([], aphabet[:], buttons[:])
     initialized_data = _init_buttons(empty_data)
-    finished_data = _find_the_next_piece(initialized_data)
+    finished_data = _find_the_next_combo(initialized_data)
     return finished_data
 
 print find_best_buttons(buttons, alphabet)
