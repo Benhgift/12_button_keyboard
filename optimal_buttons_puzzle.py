@@ -1,63 +1,107 @@
 # I'm trying to find the optimal button->letter map for the keyboard.
-# These are the facts:
-#     The keyboard uses 8 buttons for letters, 2-mer combination map 1:1 to letters
-#         ex: button 0 and button 1 at the same time map to 's'
-#     Buttons that are often pressed in succession shouldn't have their combination overlap
-#         ex: 's' mapped to (0,1) shouldn't then have 't' mapped to (0,2)
-#     Succession buttons like that that are very common should occur on different hands
-#         ex: 's' mapped to (0,1) (left hand) would then benefit from 't' being on (5,6) (right hand)
+# first get the number of occurences of each 2mer in a text
+# make a genetic algorithm that optimizes based on that
 
 from itertools import combinations
 from string import ascii_lowercase
+from collections import defaultdict as ddict
 from collections import namedtuple as nt
-import copy
+from random import shuffle 
+from random import random 
+from copy import deepcopy as dcopy
+import pdb 
+pp = pdb.set_trace
 
-buttons = list(combinations(range(8), 2))
-reserved = [(0,7), (3,4)] # backspace, space
-alphabet = list(ascii_lowercase)
+buttons = list(combinations(range(8), 2)) 
+reserved = (6,7) #backspace
+buttons.remove(reserved)
+alphabet = list(ascii_lowercase) + ['.']
 alphabet_2mers = combinations(alphabet, 2)
-letter_combination_frequency_data = dict([[y,x] for x,y in enumerate(alphabet_2mers)])
+text = "The the the and then the and the street started stealing them and they"
 
 Button = nt('button', 'combo letter')
-RunningData = nt('data', 'buttons letters combinations')
+Creature = nt('creat', 'buttons score')
 
-def _init_buttons(data):
-    data = copy.deepcopy(data)
-    if not data.buttons:
-        button1 = Button((0, 1), 's')
-        data.buttons.append(button1)
-        data.letters.remove(button1.letter)
-        data.combinations.remove(button1.combo)
-    return data
+def get_2mer_freq_data(text):
+    def _get_freq_data(text, mer):
+        mer_dict = ddict(int)
+        for x in range(len(text)-mer+1):
+            text_segment = text[x:x+mer]
+            mer_dict[text_segment] += 1
+        return mer_dict
+    return _get_freq_data(text, 2)
+def _make_rand_creature(alphabet, blank_buttons):
+    _alpha = dcopy(alphabet)
+    shuffle(_alpha)
+    buttons = []
+    for x,y in zip(blank_buttons, _alpha):
+        buttons.append(Button(x, y))
+    return Creature(buttons, 0)
+def _make_starting_creatures(num_to_make, alphabet, blank_buttons):
+    creatures = []
+    for x in range(num_to_make):
+        creatures.append(_make_rand_creature(alphabet, blank_buttons))
+    return creatures
+def _compute_button_score(button, creature, freq_data):
+    score = 0
+    x = set(button.combo)
+    for other_button in creature.buttons:
+        y = set(other_button.combo)
+        if not x.intersection(y):
+            score += freq_data[button.letter + other_button.letter]
+            score += freq_data[other_button.letter + button.letter]
+    return score
+def _compute_score(creature, freq_data):
+    score = 0
+    for button in creature.buttons:
+        score += _compute_button_score(button, creature, freq_data)
+    return Creature(creature.buttons, score)
+def _compute_data_for_all(creatures, freq_data):
+    new_creatures = []
+    for creature in creatures:
+        new_creatures.append(_compute_score(creature, freq_data))
+    return new_creatures
+def _make_mutant(creature, mutations):
+    new_creature = dcopy(creature)
+    for x in range(mutations):
+        but_len = len(creature.buttons)
+        button1 = new_creature.buttons[int(random()*but_len)]
+        button2 = new_creature.buttons[int(random()*but_len)]
+        new_creature.buttons.remove(button1)
+        if button1 != button2:
+            new_creature.buttons.remove(button2)
+        new_creature.buttons.append(Button(button1.combo, button2.letter))
+        new_creature.buttons.append(Button(button2.combo, button1.letter))
+    return new_creature
+def _breed_new_creatures(creatures, top_perc=3, mutations=4):
+    ordered_creatures = sorted(creatures, lambda x,y: x.score<y.score)
+    count = len(ordered_creatures)
+    our_count = int(count*(.01*top_perc))
+    best_creatures = ordered_creatures[0:our_count]
+    new_creatures = []
+    for x in creatures:
+        _creat = best_creatures[int(random()*our_count)]
+        new_creatures.append(_make_mutant(_creat, mutations))
+    return new_creatures
+def _get_best(creatures, best_creature):
+    ordered_creatures = sorted(creatures, lambda x,y: x.score<y.score)
+    if not best_creature:
+        return ordered_creatures[0]
+    if ordered_creatures[0].score > best_creature.score:
+        return ordered_creatures[0]
+    else:
+        return best_creature
+def get_good_combination(freq_data, generations, alphabet, buttons):
+    creatures = _make_starting_creatures(1000, alphabet, buttons)
+    creatures = _compute_data_for_all(creatures, freq_data)
+    best_creature = _get_best(creatures, None)
+    for x in range(generations):
+        print 'working on generation ' + str(x)
+        print 'best ' + str(best_creature.score)
+        creatures = _breed_new_creatures(creatures, top_perc=4, mutations=8)
+        creatures = _compute_data_for_all(creatures, freq_data)
+        best_creature = _get_best(creatures, best_creature)
+    return best_creature
 
-# alg:
-# make a 2d DP table. 
-# x axis = all combinations of n-mers from the chord set, (1), (2), (2,4,5) etc
-#   this represents usable combos, start at smallest
-# y axis = all combinations of n-mers from the alphabet
-#   this represents usable letters, start at smallest
-# fill in table, for example for a (2,4,5) and (s,t,e), it would look at the 
-#   the best 2mer combinations that used (2,4), (4,5) and (2,5) for each 2mer of (s,t,e)
-#   and attach to the best one after computing how much better the score is after adding 
-#   the third letter (s,t or e). A total or n*n comparisons
-
-def _find_the_next_combo(data): 
-    # try each of the combinations, pick the one that combines for the biggest gains
-        # find next letter for each combo
-    chosen_combo = None
-    for combo in data.combinations:
-        # to find the value for this combo we need to compare all the reprocussions of this
-        break
-    return data
-
-def _find_the_next_letter(data): 
-    # for each letter find the best one to use for thise combo
-    return data
-
-def find_best_buttons(buttons, aphabet):
-    empty_data = RunningData([], aphabet[:], buttons[:])
-    initialized_data = _init_buttons(empty_data)
-    finished_data = _find_the_next_combo(initialized_data)
-    return finished_data
-
-print find_best_buttons(buttons, alphabet)
+freq_data = get_2mer_freq_data(text)
+print get_good_combination(freq_data, 4, alphabet, buttons)
