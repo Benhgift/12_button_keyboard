@@ -32,6 +32,7 @@ def get_2mer_freq_data(text):
     return _get_freq_data(text, 2)
 def _make_rand_creature(alphabet, blank_buttons):
     _alpha = dcopy(alphabet)
+    blank_buttons = dcopy(blank_buttons)
     shuffle(_alpha)
     buttons = []
     for x,y in zip(blank_buttons, _alpha):
@@ -64,27 +65,29 @@ def _compute_data_for_all(creatures, freq_data):
 def _make_mutant(creature, mutations):
     new_creature = dcopy(creature)
     for x in range(mutations):
-        but_len = len(creature.buttons)
+        but_len = len(new_creature.buttons)
         button1 = new_creature.buttons[int(random()*but_len)]
         button2 = new_creature.buttons[int(random()*but_len)]
         new_creature.buttons.remove(button1)
+        new_creature.buttons.append(Button(button1.combo, button2.letter))
         if button1 != button2:
             new_creature.buttons.remove(button2)
-        new_creature.buttons.append(Button(button1.combo, button2.letter))
-        new_creature.buttons.append(Button(button2.combo, button1.letter))
+            new_creature.buttons.append(Button(button2.combo, button1.letter))
     return new_creature
-def _breed_new_creatures(creatures, top_perc=3, mutations=4):
-    ordered_creatures = sorted(creatures, lambda x,y: x.score<y.score)
+def _breed_new_creatures(creatures, best_creature, top_perc=3, mutations=4):
+    ordered_creatures = sorted(creatures, key=lambda x: x.score, reverse=True)
     count = len(ordered_creatures)
     our_count = int(count*(.01*top_perc))
     best_creatures = ordered_creatures[0:our_count]
     new_creatures = []
     for x in creatures:
         _creat = best_creatures[int(random()*our_count)]
-        new_creatures.append(_make_mutant(_creat, mutations))
+        newc = _make_mutant(_creat, mutations)
+        new_creatures.append(newc)
     return new_creatures
 def _get_best(creatures, best_creature):
-    ordered_creatures = sorted(creatures, lambda x,y: x.score<y.score)
+    ordered_creatures = sorted(creatures, key=lambda x: x.score, reverse=True)
+    print 'max min of generation ' + str(ordered_creatures[0].score) + ' ' + str(ordered_creatures[-1].score)
     if not best_creature:
         return ordered_creatures[0]
     if ordered_creatures[0].score > best_creature.score:
@@ -98,10 +101,10 @@ def get_good_combination(freq_data, generations, alphabet, buttons):
     for x in range(generations):
         print 'working on generation ' + str(x)
         print 'best ' + str(best_creature.score)
-        creatures = _breed_new_creatures(creatures, top_perc=4, mutations=8)
+        creatures = _breed_new_creatures(creatures, best_creature, top_perc=1, mutations=12)
         creatures = _compute_data_for_all(creatures, freq_data)
         best_creature = _get_best(creatures, best_creature)
     return best_creature
 
 freq_data = get_2mer_freq_data(text)
-print get_good_combination(freq_data, 4, alphabet, buttons)
+print get_good_combination(freq_data, 7, alphabet, buttons)
