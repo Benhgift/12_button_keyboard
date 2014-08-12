@@ -3,24 +3,38 @@
 # make a genetic algorithm that optimizes based on that
 
 from itertools import combinations
+from functools import partial
+from itertools import repeat
+from multiprocessing import Pool
 from string import ascii_lowercase
 from collections import defaultdict as ddict
 from collections import namedtuple as nt
-from random import shuffle 
-from random import random 
+from random import shuffle
+from random import random
 from copy import deepcopy as dcopy
-import pdb 
-pp = pdb.set_trace
 
-buttons = list(combinations(range(8), 2)) 
+buttons = list(combinations(range(8), 2))
 reserved = (6,7) #backspace
 buttons.remove(reserved)
+
 alphabet = list(ascii_lowercase) + ['.']
 alphabet_2mers = combinations(alphabet, 2)
-text = "The the the and then the and the street started stealing them and they"
 
-Button = nt('button', 'combo letter')
-Creature = nt('creat', 'buttons score')
+with open('training_text.txt', 'r') as f:
+    text = f.read()
+
+#Button = nt('button', 'combo letter')
+#Creature = nt('creat', 'buttons score')
+class Button(object):
+    def __init__(self, combo, letter):
+        self.__dict__.update(locals())
+    def __repr__(self):
+        return "Button %s %s" % (str(self.combo), str(self.letter))
+    def __str__(self):
+        return "Button %s %s" % (str(self.combo), str(self.letter))
+class Creature(object):
+    def __init__(self, buttons, score):
+        self.__dict__.update(locals())
 
 def get_2mer_freq_data(text):
     def _get_freq_data(text, mer):
@@ -95,16 +109,24 @@ def _get_best(creatures, best_creature):
     else:
         return best_creature
 def get_good_combination(freq_data, generations, alphabet, buttons):
-    creatures = _make_starting_creatures(1000, alphabet, buttons)
+    creatures = _make_starting_creatures(2000, alphabet, buttons)
     creatures = _compute_data_for_all(creatures, freq_data)
     best_creature = _get_best(creatures, None)
     for x in range(generations):
         print 'working on generation ' + str(x)
         print 'best ' + str(best_creature.score)
-        creatures = _breed_new_creatures(creatures, best_creature, top_perc=1, mutations=12)
+        creatures = _breed_new_creatures(creatures, best_creature, top_perc=5, mutations=1)
         creatures = _compute_data_for_all(creatures, freq_data)
         best_creature = _get_best(creatures, best_creature)
     return best_creature
 
 freq_data = get_2mer_freq_data(text)
-print get_good_combination(freq_data, 7, alphabet, buttons)
+pool = Pool(processes=4)
+get_good_combos = partial(get_good_combination, freq_data, 50, alphabet)
+
+best_creatures = pool.map_async(get_good_combos, repeat(buttons, 4)).get(99999)
+for best in best_creatures:
+    with open('best_combo', 'a') as f:
+        best_buts = sorted([x for x in best.buttons], key=lambda x: x.letter)
+        f.writelines([str(x)+'\n' for x in best_buts])
+        f.writelines(str(best.score)+'\n')

@@ -1,0 +1,20 @@
+Recently, there’s been a great deal of excitement and interest in deep neural networks because they’ve achieved breakthrough results in areas such as computer vision.1
+
+However, there remain a number of concerns about them. One is that it can be quite challenging to understand what a neural network is really doing. If one trains it well, it achieves high quality results, but it is challenging to understand how it is doing so. If the network fails, it is hard to understand what went wrong.
+
+While it is challenging to understand the behavior of deep neural networks in general, it turns out to be much easier to explore low-dimensional deep neural networks – networks that only have a few neurons in each layer. In fact, we can create visualizations to completely understand the behavior and training of such networks. This perspective will allow us to gain deeper intuition about the behavior of neural networks and observe a connection linking neural networks to an area of mathematics called topology.
+
+A number of interesting things follow from this, including fundamental lower-bounds on the complexity of a neural network capable of classifying certain datasets.
+A Simple Example
+
+Let’s begin with a very simple dataset, two curves on a plane. The network will learn to classify points as belonging to one or the other.
+
+With each layer, the network transforms the data, creating a new representation.2 We can look at the data in each of these representations and how the network classifies them. When we get to the final representation, the network will just draw a line through the data (or, in higher dimensions, a hyperplane).
+
+In the previous visualization, we looked at the data in its “raw” representation. You can think of that as us looking at the input layer. Now we will look at it after it is transformed by the first layer. You can think of this as us looking at the hidden layer.
+
+Each dimension corresponds to the firing of a neuron in the layer.
+In the approach outlined in the previous section, we learn to understand networks by looking at the representation corresponding to each layer. This gives us a discrete list of representations.
+
+The tricky part is in understanding how we go from one to another. Thankfully, neural network layers have nice properties that make this very easy.
+I heard you enjoy a certain programming language named Python. Programming is a wonderful activity. I am a little jealous that you have access to computers at your age; when I grew up I didn't even know what a computer was! I was an electronics hobbyist though, and my big dream was to build my own electronic calculator from discrete components. I never did do that, but I did build several digital clocks, and it was amazing to build something that complex and see it work. I hope you dream big too -- programmers can make computers (and robots!) do amazing things, and this is a great time to become a programmer. Just imagine how much faster computers will be in five or ten years, and what you will be able to do with your skills then!
