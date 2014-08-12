@@ -44,6 +44,7 @@ def get_2mer_freq_data(text):
             mer_dict[text_segment] += 1
         return mer_dict
     return _get_freq_data(text, 2)
+
 def _make_rand_creature(alphabet, blank_buttons):
     _alpha = dcopy(alphabet)
     blank_buttons = dcopy(blank_buttons)
@@ -52,11 +53,13 @@ def _make_rand_creature(alphabet, blank_buttons):
     for x,y in zip(blank_buttons, _alpha):
         buttons.append(Button(x, y))
     return Creature(buttons, 0)
+
 def _make_starting_creatures(num_to_make, alphabet, blank_buttons):
     creatures = []
     for x in range(num_to_make):
         creatures.append(_make_rand_creature(alphabet, blank_buttons))
     return creatures
+
 def _compute_button_score(button, creature, freq_data):
     score = 0
     x = set(button.combo)
@@ -66,16 +69,19 @@ def _compute_button_score(button, creature, freq_data):
             score += freq_data[button.letter + other_button.letter]
             score += freq_data[other_button.letter + button.letter]
     return score
+
 def _compute_score(creature, freq_data):
     score = 0
     for button in creature.buttons:
         score += _compute_button_score(button, creature, freq_data)
     return Creature(creature.buttons, score)
+
 def _compute_data_for_all(creatures, freq_data):
     new_creatures = []
     for creature in creatures:
         new_creatures.append(_compute_score(creature, freq_data))
     return new_creatures
+
 def _make_mutant(creature, mutations):
     new_creature = dcopy(creature)
     for x in range(mutations):
@@ -88,6 +94,7 @@ def _make_mutant(creature, mutations):
             new_creature.buttons.remove(button2)
             new_creature.buttons.append(Button(button2.combo, button1.letter))
     return new_creature
+
 def _breed_new_creatures(creatures, best_creature, top_perc=3, mutations=4):
     ordered_creatures = sorted(creatures, key=lambda x: x.score, reverse=True)
     count = len(ordered_creatures)
@@ -99,6 +106,7 @@ def _breed_new_creatures(creatures, best_creature, top_perc=3, mutations=4):
         newc = _make_mutant(_creat, mutations)
         new_creatures.append(newc)
     return new_creatures
+
 def _get_best(creatures, best_creature):
     ordered_creatures = sorted(creatures, key=lambda x: x.score, reverse=True)
     print 'max min of generation ' + str(ordered_creatures[0].score) + ' ' + str(ordered_creatures[-1].score)
@@ -108,6 +116,7 @@ def _get_best(creatures, best_creature):
         return ordered_creatures[0]
     else:
         return best_creature
+
 def get_good_combination(freq_data, generations, alphabet, buttons):
     creatures = _make_starting_creatures(2000, alphabet, buttons)
     creatures = _compute_data_for_all(creatures, freq_data)
