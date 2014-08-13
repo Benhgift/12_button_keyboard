@@ -11,19 +11,19 @@ tty.setcbreak(sys.stdin)
 class Keypress():
     def __init__(self):
         self.keymap = {
-                'qw':'a', 'we':'i', 'er':'o',
-                'qe':'e', 'qr':'h', 'wr':'t',
-                'ui':'s', 'io':'n', 'op':'b',
-                'uo':'c', 'up':'d', 'ip':'f',
-                'qu':'g', 'qi':'j', 'qo':'k',
-                'qp':'l', 'wu':'m', 'wi':'p',
-                'wo':'q', 'wp':'r',
-                'eu':'u', 'ei':'v', 'eo':'w',
-                'ep':'x', 'ru':'y', 'ri':'z',
-                'ro':'.', 'rp':'<-',
-                'n':' ', 'm':'-crtl-',
-                'c':'-mod', 'v':'-shift-'
-                }
+            'io':'a', 'ui':'b', 'qp':'c',
+            'we':'d', 'ro':'e', 'qr':'f',
+            'wo':'g', 'eu':'h', 'ri':'i',
+            'er':'j', 'wi':'k', 'wu':'l',
+            'wp':'m', 'qu':'n', 'eo':'o',
+            'qi':'p', 'qo':'q', 'up':'r',
+            'ep':'s', 'qw':'t', 'wr':'u',
+            'qe':'v', 'ip':'w', 'uo':'x',
+            'rp':'y', 'ru':'z',
+            'ei':'.', 'op':'<-',
+            'n':' ', 'm':'-crtl-',
+            'c':'-mod-', 'v':'-shift-'
+            }
         self.current_keys = []
         self.last_time = datetime.now()
         self.this_time = datetime.now()
